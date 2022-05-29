@@ -5,7 +5,7 @@ odrive_motor_control
 OS : Raspbian(buster)  
 ROS : noetic
 
-# Execution
+# Motor operation check
 ## STEP1
 ```
 roscore
