@@ -21,17 +21,16 @@ class OdomPublisher():
         self.t = TransformStamped()
         self.t.header.stamp = rospy.Time.now()
         self.t.header.frame_id = 'odom'
-        self.t.child_frame_id = 'base_footprint'
+        self.t.child_frame_id = 'base_link'
 
         # for publisher
         self.odom = Odometry()
         self.odom.header.frame_id = "odom"
-        self.odom.child_frame_id = "base_footrprint"
+        self.odom.child_frame_id = "base_link"
 
         # for buffer
         self.odom_buf = Vector3()
 
-        
     def bufCB(self, data):
         self.odom_buf.x = data.x
         self.odom_buf.y = data.y

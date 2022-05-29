@@ -91,7 +91,7 @@ class OdriveMotorControl:
                 left_pos_diff  = self.left_pos - self.last_left_pos
                 self.calcodom(right_pos_diff, left_pos_diff)
                 
-                print(self.odrv0.axis0.encoder.pos_estimate)
+                #print(self.odrv0.axis0.encoder.pos_estimate)
 
                 # Set velocity
                 self.odrv0.axis0.controller.input_vel = right_pulse
