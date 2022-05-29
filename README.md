@@ -7,7 +7,7 @@ ROS : noetic
 
 # motor configuration
 ```
-sudo pytho3 
+sudo pytho3 odrive_config.py
 ```
 
 # motor operation check
