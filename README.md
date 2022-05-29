@@ -38,10 +38,12 @@ crw-rw-rw- 1 root root 189, 8 5月 29 14:49 /dev/bus//usb//001/009
 
 ## STEP3
 ```
+source ~/catkin_ws/devel/setup.bash
 rosrun odrive_motor_control key_teleop.py
 ```
 ## STEP4
 ```
+source ~/catkin_ws/devel/setup.bash
 rosrun odrive_motor_control odrive_ros_control.py
 ```
 If all goes well, the following message will appear on the terminal
