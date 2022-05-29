@@ -7,6 +7,7 @@ ROS : noetic
 
 # motor configuration
 ```
+cd ~/catkin_ws/src/odrive_motor_control/script
 sudo pytho3 odrive_config.py
 ```
 
