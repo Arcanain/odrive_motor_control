@@ -5,7 +5,12 @@ odrive_motor_control
 OS : Raspbian(buster)  
 ROS : noetic
 
-# Motor operation check
+# motor configuration
+```
+sudo pytho3 
+```
+
+# motor operation check
 ## STEP1
 ```
 roscore
