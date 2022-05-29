@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="odrive_motor_control" name="odrive_twist_driver" type="odrive_twist_driver.py" output="screen"/>
+    <node pkg="odrive_motor_control" name="odom_publisher" type="odom_publisher.py" output="screen"/>
+</launch>
