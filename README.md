@@ -52,3 +52,9 @@ If all goes well, the following message will appear on the terminal
 Connect to Odrive...
 Connect to Odrive Success!!!
 ```
+
+# odom publish
+```
+source ~/catkin_ws/devel/setup.bash
+roslaunch odrive_motor_control odrive_control.launch
+```
