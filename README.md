@@ -1,5 +1,5 @@
 # odrive_motor_control
-odrive_motor_control
+## scripts
 
 odrive_config.py       : Odrive for BLDC motor Automatic configuration.  
 odrive_twist_driver.py : Odrive subscrive /cmd_vel, then calculate /odom_buf.  
