@@ -80,4 +80,8 @@ ls -al /dev/bus//usb//001/009
 crw-rw-rw- 1 root root 189, 8 5月 29 14:49 /dev/bus//usb//001/009
 ```
 # STEP2
-
+```
+cd ~/catkin_ws
+source ~/catkin_ws/devel/setup.bash
+roslaunch odrive_motor_control odrive_joystick_control.launch
+```
