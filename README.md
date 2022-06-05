@@ -11,7 +11,7 @@ cd ~/catkin_ws/src/odrive_motor_control/script
 sudo pytho3 odrive_config.py
 ```
 
-# motor operation check
+# motor operation check(Keyboard)
 ## STEP1
 ```
 roscore
@@ -51,6 +51,13 @@ If all goes well, the following message will appear on the terminal
 ```
 Connect to Odrive...
 Connect to Odrive Success!!!
+```
+
+## roslaunch version
+```
+cd ~/catkin_ws
+source ~/catkin_ws/devel/setup.bash
+roslaunch odrive_motor_control odrive_keyboard_control.launch
 ```
 
 # odom publish
