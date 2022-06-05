@@ -26,7 +26,8 @@ class KeyTeleop(object):
     self.settings = termios.tcgetattr(sys.stdin)
     # Initial values
     self.inc_ratio = 0.1
-    self.speed = np.array([0.5, 1.0])
+    #self.speed = np.array([0.5, 1.0])
+    self.speed = np.array([0.25, 0.5])
     self.command = np.array([0, 0])
     self.update_rate = 10   # Hz
     self.alive = True

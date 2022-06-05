@@ -29,12 +29,15 @@ class OdriveMotorControl:
         self.tread              = 0.4
         self.target_linear_vel  = 0.0
         self.target_angular_vel = 0.0
-        self.right_wheel_radius = 0.08
-        self.left_wheel_radius  = 0.08
+        self.right_wheel_radius = 0.165
+        self.left_wheel_radius  = 0.165
+        self.encoder_cpr        = 90.0
         # <axis>.encoder.pos_estimate [turns]
         # https://docs.odriverobotics.com/v/latest/commands.html
-        self.right_pos          = self.odrv0.axis0.encoder.pos_estimate/900.0*m.pi*self.right_wheel_radius
-        self.left_pos           = -self.odrv0.axis1.encoder.pos_estimate/900.0*m.pi*self.left_wheel_radius
+        #self.right_pos          = self.odrv0.axis0.encoder.pos_estimate/900.0*m.pi*self.right_wheel_radius
+        #self.left_pos           = -self.odrv0.axis1.encoder.pos_estimate/900.0*m.pi*self.left_wheel_radius
+        self.right_pos          = self.odrv0.axis0.encoder.pos_estimate/self.encoder_cpr*m.pi*self.right_wheel_radius
+        self.left_pos           = -self.odrv0.axis1.encoder.pos_estimate/self.encoder_cpr*m.pi*self.left_wheel_radius
         self.last_right_pos     = self.right_pos
         self.last_left_pos      = self.left_pos
 
@@ -80,13 +83,18 @@ class OdriveMotorControl:
             right_vel, left_vel = self.calc_relative_vel(self.target_linear_vel, self.target_angular_vel)
 
             # convert to pulse
-            right_pulse = right_vel/(m.pi*self.right_wheel_radius)*900.0
-            left_pulse  = left_vel/(m.pi*self.left_wheel_radius)*900.0
+            #right_pulse = right_vel/(m.pi*self.right_wheel_radius)*900.0
+            #left_pulse  = left_vel/(m.pi*self.left_wheel_radius)*900.0
+
+            right_pulse = right_vel/(m.pi*self.right_wheel_radius)*self.encoder_cpr
+            left_pulse  = left_vel/(m.pi*self.left_wheel_radius)*self.encoder_cpr
             
             try:
                 # Get current position
-                self.right_pos = self.odrv0.axis0.encoder.pos_estimate/900.0*m.pi*self.right_wheel_radius
-                self.left_pos  = -self.odrv0.axis1.encoder.pos_estimate/900.0*m.pi*self.left_wheel_radius
+                #self.right_pos = self.odrv0.axis0.encoder.pos_estimate/900.0*m.pi*self.right_wheel_radius
+                #self.left_pos  = -self.odrv0.axis1.encoder.pos_estimate/900.0*m.pi*self.left_wheel_radius
+                self.right_pos = self.odrv0.axis0.encoder.pos_estimate/self.encoder_cpr*m.pi*self.right_wheel_radius
+                self.left_pos  = -self.odrv0.axis1.encoder.pos_estimate/self.encoder_cpr*m.pi*self.left_wheel_radius
                 right_pos_diff = self.right_pos - self.last_right_pos
                 left_pos_diff  = self.left_pos - self.last_left_pos
                 self.calcodom(right_pos_diff, left_pos_diff)

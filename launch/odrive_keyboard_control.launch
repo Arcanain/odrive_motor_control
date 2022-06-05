@@ -1,6 +1,8 @@
 <launch>
+    <!--connect odrive and subscribe /cmd_vel calcurlate odometry-->
     <node pkg="odrive_motor_control" name="odrive_twist_driver" type="odrive_twist_driver.py" output="screen"/>
+    <!--publish Odometry-->
     <node pkg="odrive_motor_control" name="odom_publisher" type="odom_publisher.py" output="screen"/>
-
+    <!--keyboatd teleop publish /cmd_vel-->
     <node pkg="odrive_motor_control" name="keyboard_teleop" type="keyboard_teleop.py" output="screen"/>
 </launch>
