@@ -1,6 +1,8 @@
 # odrive_motor_control
 odrive_motor_control
 
+odrive_config.py : 
+
 ## Environment
 OS : Raspbian(buster)  
 ROS : noetic
@@ -8,7 +10,7 @@ ROS : noetic
 # motor configuration
 ```
 cd ~/catkin_ws/src/odrive_motor_control/script
-sudo pytho3 odrive_config.py
+sudo python3 odrive_config.py
 ```
 
 # motor operation check(Keyboard)
