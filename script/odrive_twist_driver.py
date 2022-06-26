@@ -22,52 +22,37 @@ class OdriveMotorControl:
         self.find_odrive()
         
         # setup parameter
-        self.tire_tread         = 0.32                      #[m] distance between wheel centres
-        self.target_linear_vel  = 0.0                       #[m/s]
-        self.target_angular_vel = 0.0                       #[rad/s]
-        self.tire_diameter      = 0.165                     #[m]
-        self.right_wheel_radius = self.tire_diameter        #[m]
-        self.left_wheel_radius  = self.tire_diameter        #[m]
-        self.encoder_cpr        = 90.0                      #[count]
-        self.tire_circumference = math.pi * self.tire_diameter #[m]
-        self.m_t_to_value       = 1.0 / (self.tire_circumference) #[turns/s]
+        self.tire_tread         = 0.32                                         #[m] distance between wheel centres
+        self.target_linear_vel  = 0.0                                          #[m/s]
+        self.target_angular_vel = 0.0                                          #[rad/s]
+        self.tire_diameter      = 0.165                                        #[m]
+        self.right_wheel_radius = self.tire_diameter                           #[m]
+        self.left_wheel_radius  = self.tire_diameter                           #[m]
+        self.encoder_cpr        = 90.0                                         #[count]
+        self.tire_circumference = math.pi * self.tire_diameter                 #[m]
+        self.m_t_to_value       = 1.0 / (self.tire_circumference)              #[turns/s]
         self.m_s_to_value       = self.encoder_cpr / (self.tire_circumference) #[count/s]
-        self.vel_l = 0.0
-        self.vel_r = 0.0
-        self.new_pos_l = 0.0
-        self.new_pos_r = 0.0
-        self.old_pos_l = 0.0
-        self.old_pos_r = 0.0
+        self.vel_l = 0.0     #[count/s]
+        self.vel_r = 0.0     #[count/s]
+        self.new_pos_l = 0.0 #[count]
+        self.new_pos_r = 0.0 #[count]
+        self.old_pos_l = 0.0 #[count]
+        self.old_pos_r = 0.0 #[count]
+
         # store current location to be updated. 
-        self.x = 0.0
-        self.y = 0.0
-        self.theta = 0.0
-
-        # https://qiita.com/honeytrap15/items/550c757f2964b575883c
-        self.odom_frame         = rospy.get_param('~odom_frame', "odom")
-        self.base_frame         = rospy.get_param('~base_frame', "base_link")
-
-        # <axis>.encoder.pos_estimate [turns]
-        # https://docs.odriverobotics.com/v/latest/commands.html
-        #self.right_pos          = self.odrv0.axis0.encoder.pos_estimate/900.0*m.pi*self.right_wheel_radius
-        #self.left_pos           = -self.odrv0.axis1.encoder.pos_estimate/900.0*m.pi*self.left_wheel_radius
-        self.right_pos          = self.odrv0.axis0.encoder.pos_estimate/self.encoder_cpr*math.pi*self.right_wheel_radius
-        self.left_pos           = -self.odrv0.axis1.encoder.pos_estimate/self.encoder_cpr*math.pi*self.left_wheel_radius
-        self.last_right_pos     = self.right_pos
-        self.last_left_pos      = self.left_pos
+        self.x = 0.0     #[m]
+        self.y = 0.0     #[m]
+        self.theta = 0.0 #[rad]
 
         # subscriber cmd_vel
         rospy.Subscriber("cmd_vel", Twist, self.callback_vel)
-        
-        # publisher odom
-        self.odom_pub = rospy.Publisher("odom_buf", Vector3, queue_size=1)
-        self.odom = Vector3()
-        self.odom.x = 0.0
-        self.odom.y = 0.0
-        self.odom.z = 0.0
 
         # publish odom
         self.odom_publisher = rospy.Publisher("odom", Odometry, tcp_nodelay=True, queue_size=2)
+        # https://qiita.com/honeytrap15/items/550c757f2964b575883c
+        self.odom_frame = rospy.get_param('~odom_frame', "odom")
+        self.base_frame = rospy.get_param('~base_frame', "base_link")
+
         # setup message
         self.odom_msg = Odometry()
         #print(dir(self.odom_msg))
@@ -117,6 +102,7 @@ class OdriveMotorControl:
         self.odrv0.axis1.controller.input_vel = 0
     
     def calcodom(self, current_time):
+        # https://docs.odriverobotics.com/v/latest/commands.html
         ######################
         # Calcurate Position #
         ######################
@@ -246,7 +232,7 @@ class OdriveMotorControl:
     def callback_vel(self, msg):
         self.target_linear_vel = msg.linear.x
         self.target_angular_vel = msg.angular.z
-        
+    
 if __name__ == "__main__":
     rospy.init_node("odrive_motor_control", disable_signals=True)
     Odrive_motor_control = OdriveMotorControl()
