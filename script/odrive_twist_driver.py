@@ -143,14 +143,16 @@ class OdriveMotorControl:
         #self.new_pos_l = self.odrv0.axis1.encoder.pos_est_counts
         #self.new_pos_r = self.odrv0.axis0.encoder.pos_estimate
         #self.new_pos_l = self.odrv0.axis1.encoder.pos_estimate
-        self.new_pos_r = self.encoder_cpr * self.odrv0.axis0.encoder.pos_estimate
-        self.new_pos_l = self.encoder_cpr * self.odrv0.axis1.encoder.pos_estimate
 
-        delta_pos_r = self.new_pos_r - self.old_pos_r
-        delta_pos_l = self.new_pos_l - self.old_pos_l
+        # convert [turn] into [count]
+        self.new_pos_r = self.encoder_cpr * self.odrv0.axis0.encoder.pos_estimate #[count]
+        self.new_pos_l = self.encoder_cpr * self.odrv0.axis1.encoder.pos_estimate #[count]
+
+        delta_pos_r = self.new_pos_r - self.old_pos_r #[count]
+        delta_pos_l = self.new_pos_l - self.old_pos_l #[count]
         
-        self.old_pos_r = self.new_pos_r
-        self.old_pos_l = self.new_pos_l
+        self.old_pos_r = self.new_pos_r #[count]
+        self.old_pos_l = self.new_pos_l #[count]
         
         # Check for overflow. Assume we can't move more than half a circumference in a single timestep. 
         half_cpr = self.encoder_cpr / 2.0
@@ -175,8 +177,6 @@ class OdriveMotorControl:
         yd = -math.sin(th)*d
 
         # Pose: updated from previous pose + position delta
-        #self.x = self.x + math.cos(self.theta)*xd - math.sin(self.theta)*yd
-        #self.y = self.y + math.sin(self.theta)*xd + math.cos(self.theta)*yd
         self.x += math.cos(self.theta)*xd - math.sin(self.theta)*yd
         self.y += math.sin(self.theta)*xd + math.cos(self.theta)*yd
         self.theta = (self.theta + th) % (2*math.pi)
@@ -187,6 +187,28 @@ class OdriveMotorControl:
         v = self.tire_circumference * (self.vel_r + self.vel_l) / (2.0*self.encoder_cpr)
         w = self.tire_circumference * (self.vel_r - self.vel_l) / (self.tire_tread * self.encoder_cpr) # angle: vel_r*tyre_radius - vel_l*tyre_radius
 
+        ####################
+        # Publish Odometry #
+        ####################
+        self.odom_msg.header.stamp = current_time
+        self.odom_msg.pose.pose.position.x = self.x
+        self.odom_msg.pose.pose.position.y = self.y
+        q = tf_conversions.transformations.quaternion_from_euler(0.0, 0.0, self.theta)
+        self.odom_msg.pose.pose.orientation.z = q[2] # math.sin(self.theta)/2
+        self.odom_msg.pose.pose.orientation.w = q[3] # math.cos(self.theta)/2
+        self.odom_msg.twist.twist.linear.x  = v
+        self.odom_msg.twist.twist.angular.z = w
+        self.odom_publisher.publish(self.odom_msg)
+
+        ######################################
+        # transform odom_frame to base_frame #
+        ######################################
+        self.tf_msg.transform.translation.x = self.x
+        self.tf_msg.transform.translation.y = self.y
+        self.tf_msg.transform.rotation.z = q[2]
+        self.tf_msg.transform.rotation.w = q[3]
+        self.tf_publisher.sendTransform(self.tf_msg)  
+        
         #print(delta_pos_r)
         #print(delta_pos_l)
         #print(delta_pos_r_m)
