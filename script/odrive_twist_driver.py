@@ -116,34 +116,10 @@ class OdriveMotorControl:
         self.odrv0.axis0.controller.input_vel = 0
         self.odrv0.axis1.controller.input_vel = 0
     
-    """
-    def calcodom(self, right_delta_dist, left_delta_dist):
-        delta_linear = (right_delta_dist + left_delta_dist)/2.0
-        delta_yaw    = (right_delta_dist - left_delta_dist)/self.tire_tread
-        approximate_delta_linear = 0.0
-        turn_rad = 0.0
-        
-        if abs(delta_yaw) < 245e-3:
-            self.odom.x = self.odom.x + delta_linear * math.cos(self.odom.z + (delta_yaw/2.)) 
-            self.odom.y = self.odom.y + delta_linear * math.sin(self.odom.z + (delta_yaw/2.))
-            self.odom.z = self.odom.z + delta_yaw
-        else:
-            turn_rad = delta_linear/delta_yaw
-            approximate_delta_linear = 2.0*turn_rad*math.sin((delta_yaw/2.))
-            self.odom.x = self.odom.x +  approximate_delta_linear * math.cos(self.odom.z + (delta_yaw/2.))
-            self.odom.y = self.odom.y + approximate_delta_linear * math.sin(self.odom.z + (delta_yaw/2.))
-            self.odom.z = self.odom.z + delta_yaw
-            
-        self.odom_pub.publish(self.odom)
-    """
-
     def calcodom(self, current_time):
-        # Calcurate Position
-        #self.new_pos_r = self.odrv0.axis0.encoder.pos_est_counts
-        #self.new_pos_l = self.odrv0.axis1.encoder.pos_est_counts
-        #self.new_pos_r = self.odrv0.axis0.encoder.pos_estimate
-        #self.new_pos_l = self.odrv0.axis1.encoder.pos_estimate
-
+        ######################
+        # Calcurate Position #
+        ######################
         # convert [turn] into [count]
         self.new_pos_r = self.encoder_cpr * self.odrv0.axis0.encoder.pos_estimate #[count]
         self.new_pos_l = self.encoder_cpr * self.odrv0.axis1.encoder.pos_estimate #[count]
@@ -237,35 +213,16 @@ class OdriveMotorControl:
         
             # calculate relative velocity
             right_vel, left_vel = self.calc_relative_vel(self.target_linear_vel, self.target_angular_vel)
-
-            # convert to pulse
-            #right_pulse = right_vel/(m.pi*self.right_wheel_radius)*900.0
-            #left_pulse  = left_vel/(m.pi*self.left_wheel_radius)*900.0
-
-            #right_pulse = right_vel/(m.pi*self.right_wheel_radius)*self.encoder_cpr
-            #left_pulse  = left_vel/(m.pi*self.left_wheel_radius)*self.encoder_cpr
             
             try:
                 # Get current position
-                #self.right_pos = self.odrv0.axis0.encoder.pos_estimate/900.0*m.pi*self.right_wheel_radius
-                #self.left_pos  = -self.odrv0.axis1.encoder.pos_estimate/900.0*m.pi*self.left_wheel_radius
-                #self.right_pos = self.odrv0.axis0.encoder.pos_estimate/self.encoder_cpr*math.pi*self.right_wheel_radius
-                #self.left_pos  = -self.odrv0.axis1.encoder.pos_estimate/self.encoder_cpr*math.pi*self.left_wheel_radius
-                #right_pos_diff = self.right_pos - self.last_right_pos
-                #left_pos_diff  = self.left_pos - self.last_left_pos
-                #self.calcodom(right_pos_diff, left_pos_diff)
                 self.calcodom(current_time)
-                
-                #print(self.odrv0.axis0.encoder.pos_estimate)
 
                 # Set velocity
                 self.odrv0.axis0.controller.input_vel = right_vel
                 self.odrv0.axis1.controller.input_vel = -left_vel
                 
-                # Update last pos
-                #self.last_right_pos = self.right_pos
-                #self.last_left_pos = self.left_pos
-                
+                # Time sleep
                 rate.sleep()
             except AttributeError as error:
                 # Output expected AttributeErrors.
