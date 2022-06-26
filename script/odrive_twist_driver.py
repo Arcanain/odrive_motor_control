@@ -26,12 +26,15 @@ class OdriveMotorControl:
         self.odom.z = 0.0
         
         # setup parameter
-        self.tread              = 0.4
-        self.target_linear_vel  = 0.0
-        self.target_angular_vel = 0.0
-        self.right_wheel_radius = 0.165
-        self.left_wheel_radius  = 0.165
-        self.encoder_cpr        = 90.0
+        self.tire_tread         = 0.4                       #[m]
+        self.target_linear_vel  = 0.0                       #[m/s]
+        self.target_angular_vel = 0.0                       #[rad/s]
+        self.tire_diameter      = 0.165                     #[m]
+        self.right_wheel_radius = self.tire_diameter        #[m]
+        self.left_wheel_radius  = self.tire_diameter        #[m]
+        self.encoder_cpr        = 90.0                      #[count]
+        self.tire_circumference = m.pi * self.tire_diameter #[m]
+
         # <axis>.encoder.pos_estimate [turns]
         # https://docs.odriverobotics.com/v/latest/commands.html
         #self.right_pos          = self.odrv0.axis0.encoder.pos_estimate/900.0*m.pi*self.right_wheel_radius
@@ -59,7 +62,7 @@ class OdriveMotorControl:
     
     def calcodom(self, right_delta_dist, left_delta_dist):
         delta_linear = (right_delta_dist + left_delta_dist)/2.0
-        delta_yaw    = (right_delta_dist - left_delta_dist)/self.tread
+        delta_yaw    = (right_delta_dist - left_delta_dist)/self.tire_tread
         approximate_delta_linear = 0.0
         turn_rad = 0.0
         
@@ -86,8 +89,8 @@ class OdriveMotorControl:
             #right_pulse = right_vel/(m.pi*self.right_wheel_radius)*900.0
             #left_pulse  = left_vel/(m.pi*self.left_wheel_radius)*900.0
 
-            right_pulse = right_vel/(m.pi*self.right_wheel_radius)*self.encoder_cpr
-            left_pulse  = left_vel/(m.pi*self.left_wheel_radius)*self.encoder_cpr
+            #right_pulse = right_vel/(m.pi*self.right_wheel_radius)*self.encoder_cpr
+            #left_pulse  = left_vel/(m.pi*self.left_wheel_radius)*self.encoder_cpr
             
             try:
                 # Get current position
@@ -102,8 +105,8 @@ class OdriveMotorControl:
                 #print(self.odrv0.axis0.encoder.pos_estimate)
 
                 # Set velocity
-                self.odrv0.axis0.controller.input_vel = right_pulse
-                self.odrv0.axis1.controller.input_vel = -left_pulse
+                self.odrv0.axis0.controller.input_vel = right_vel
+                self.odrv0.axis1.controller.input_vel = -left_vel
                 
                 # Update last pos
                 self.last_right_pos = self.right_pos
@@ -120,9 +123,17 @@ class OdriveMotorControl:
                 
     def calc_relative_vel(self, target_linear_vel, target_angular_vel):
         # Convert to each vel
-        right_vel = target_linear_vel + (self.tread / 2.0) * target_angular_vel
-        left_vel  = target_linear_vel - (self.tread / 2.0) * target_angular_vel
+        #right_vel = target_linear_vel + (self.tire_tread / 2.0) * target_angular_vel
+        #left_vel  = target_linear_vel - (self.tire_tread / 2.0) * target_angular_vel
         
+        # Convert to each circumferential velocity
+        circumferential_right_vel = target_linear_vel + (self.tire_tread / 2.0) * target_angular_vel #[m/s]
+        circumferential_left_vel  = target_linear_vel - (self.tire_tread / 2.0) * target_angular_vel #[m/s]
+
+        # Convert to each rotational velocity
+        right_vel = circumferential_right_vel / self.tire_circumference #[turn/s]
+        left_vel  = circumferential_left_vel / self.tire_circumference  #[turn/s]
+
         return right_vel, left_vel
     
     def callback_vel(self, msg):
