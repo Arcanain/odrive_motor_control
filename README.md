@@ -45,6 +45,9 @@ Connect to Odrive...
 Connect to Odrive Success!!!
 ```
 
+## rviz
+![Screenshot at 2022-09-25 04-22-02](https://user-images.githubusercontent.com/52307432/192115079-4b98a837-ac96-4961-88ec-0cbac8609a34.png)
+
 # motor operation check(joystick)
 ## STEP1
 ```
@@ -60,7 +63,7 @@ crw-rw-r-- 1 root root 189, 8 5月 29 14:49 /dev/bus//usb//001/009
 ```
 sudo chmod 666 /dev/bus/usb/001/009
 ```
-# STEP2
+## STEP2
 ```
 cd ~/catkin_ws
 source ~/catkin_ws/devel/setup.bash
