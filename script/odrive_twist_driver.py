@@ -3,7 +3,8 @@ import rospy
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Vector3
+from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseStamped
 
 import tf.transformations
 import tf_conversions
@@ -48,14 +49,21 @@ class OdriveMotorControl:
         rospy.Subscriber("cmd_vel", Twist, self.callback_vel)
 
         # publish odom
-        self.odom_publisher = rospy.Publisher("odom", Odometry, tcp_nodelay=True, queue_size=2)
-        # https://qiita.com/honeytrap15/items/550c757f2964b575883c
-        self.odom_frame = rospy.get_param('~odom_frame', "odom")
-        self.base_frame = rospy.get_param('~base_frame', "base_link")
+        self.odom_publisher = rospy.Publisher("odom", Odometry, tcp_nodelay=True, queue_size=10)
+
+        # publish odom_path
+        self.odom_path_publisher = rospy.Publisher("odom_path", Path, tcp_nodelay=True, queue_size=10)
+        self.poses_list = []
 
         # setup message
+        # https://qiita.com/honeytrap15/items/550c757f2964b575883c
+        #self.odom_frame = rospy.get_param('~odom_frame', "odom")
+        #self.base_frame = rospy.get_param('~base_frame', "base_link")
+
+        self.odom_frame = "map"
+        self.base_frame = "base_link"
+
         self.odom_msg = Odometry()
-        #print(dir(self.odom_msg))
         self.odom_msg.header.frame_id = self.odom_frame
         self.odom_msg.child_frame_id  = self.base_frame
         self.odom_msg.pose.pose.position.x = 0.0
@@ -148,7 +156,9 @@ class OdriveMotorControl:
         self.vel_l = self.encoder_cpr * self.odrv0.axis1.encoder.vel_estimate * (-1)
         v = self.tire_circumference * (self.vel_r + self.vel_l) / (2.0*self.encoder_cpr)
         w = self.tire_circumference * (self.vel_r - self.vel_l) / (self.tire_tread * self.encoder_cpr) # angle: vel_r*tyre_radius - vel_l*tyre_radius
-
+        #print(v)
+        #sprint(w)
+        
         ####################
         # Publish Odometry #
         ####################
@@ -169,8 +179,29 @@ class OdriveMotorControl:
         self.tf_msg.transform.translation.y = self.y
         self.tf_msg.transform.rotation.z = q[2]
         self.tf_msg.transform.rotation.w = q[3]
-        self.tf_publisher.sendTransform(self.tf_msg)  
-        
+        self.tf_publisher.sendTransform(self.tf_msg)
+
+        #########################
+        # Publish Odometry Path #
+        #########################
+        temp_pose = PoseStamped()
+        temp_pose.header.stamp = rospy.Time.now()
+        temp_pose.header.frame_id = "map"
+        temp_pose.pose.position.x = self.x
+        temp_pose.pose.position.y = self.y
+        temp_pose.pose.orientation.z = q[2]
+        temp_pose.pose.orientation.w = q[3]
+
+        self.poses_list.append(temp_pose)
+
+        # creat path data
+        self.path = Path()
+        self.path.header.stamp = rospy.Time.now()
+        self.path.header.frame_id = "map"
+        self.path.poses = self.poses_list
+
+        self.odom_path_publisher.publish(self.path)
+
         #print(delta_pos_r)
         #print(delta_pos_l)
         #print(delta_pos_r_m)

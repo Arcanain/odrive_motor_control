@@ -1,8 +1,10 @@
 <launch>
+    <!-- tf satic -->
+    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 100" />
     <!--connect odrive and subscribe /cmd_vel calcurlate odometry-->
     <node pkg="odrive_motor_control" name="odrive_twist_driver" type="odrive_twist_driver.py" output="screen"/>
-    <!--publish Odometry-->
-    <node pkg="odrive_motor_control" name="odom_publisher" type="odom_publisher.py" output="screen"/>
     <!--keyboatd teleop publish /cmd_vel-->
     <node pkg="odrive_motor_control" name="keyboard_teleop" type="keyboard_teleop.py" output="screen"/>
+    <!--rviz-->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find odrive_motor_control)/rviz/odom_publish.rviz" required="true"/>
 </launch>

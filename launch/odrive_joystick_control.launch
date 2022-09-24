@@ -1,10 +1,8 @@
 <launch>
+    <!-- tf satic -->
+    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 100" />
     <!--connect odrive and subscribe /cmd_vel calcurlate odometry-->
     <node pkg="odrive_motor_control" name="odrive_twist_driver" type="odrive_twist_driver.py" output="screen"/>
-
-    <!--publish Odometry-->
-    <!--<node pkg="odrive_motor_control" name="odom_publisher" type="odom_publisher.py" output="screen"/>-->
-
     <!--<arg name="mode" default="usb"/>-->
     <arg name="dev" default="/dev/input/js0"/>
     <!-- joy stick driver -->
@@ -13,4 +11,6 @@
     </node>
     <!-- joy to twist converter -->
     <node pkg="joy_to_twist" name="joy_to_twist" type="joy_to_twist"/>
+    <!--rviz-->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find odrive_motor_control)/rviz/odom_publish.rviz" required="true"/>
 </launch>
