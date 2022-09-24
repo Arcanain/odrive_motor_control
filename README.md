@@ -2,12 +2,11 @@
 ## scripts
 
 odrive_config.py       : Odrive for BLDC motor Automatic configuration.  
-odrive_twist_driver.py : Odrive subscrive /cmd_vel, then calculate /odom_buf.  
-odom_publisher.py      : subscribe /odom_buf, then publish /odom.  
+odrive_twist_driver.py : Odrive subscrive /cmd_vel, then calculate /odom and /odom_path  
 keyboard_teleop.py     : keyborad input, then publish /cmd_vel.  
 
 ## Environment
-OS : Raspbian(buster)  
+OS : Ubuntu Mate  
 ROS : noetic
 
 # motor configuration
