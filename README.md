@@ -45,19 +45,6 @@ Connect to Odrive...
 Connect to Odrive Success!!!
 ```
 
-## roslaunch version
-```
-cd ~/catkin_ws
-source ~/catkin_ws/devel/setup.bash
-roslaunch odrive_motor_control odrive_keyboard_control.launch
-```
-
-# odom publish
-```
-source ~/catkin_ws/devel/setup.bash
-roslaunch odrive_motor_control odrive_control.launch
-```
-
 # motor operation check(joystick)
 ## STEP1
 ```
@@ -72,11 +59,6 @@ crw-rw-r-- 1 root root 189, 8 5月 29 14:49 /dev/bus//usb//001/009
 
 ```
 sudo chmod 666 /dev/bus/usb/001/009
-```
-
-```
-ls -al /dev/bus//usb//001/009
-crw-rw-rw- 1 root root 189, 8 5月 29 14:49 /dev/bus//usb//001/009
 ```
 # STEP2
 ```
