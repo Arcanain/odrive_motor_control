@@ -32,7 +32,8 @@ class KeyTeleop(object):
     self.update_rate = 10   # Hz
     self.alive = True
     # Setup publisher
-    self.pub_twist = rospy.Publisher('/cmd_vel', Twist)
+    #self.pub_twist = rospy.Publisher('/cmd_vel', Twist)
+    self.pub_twist = rospy.Publisher('/cmd_vel_keyboard', Twist)
  
   def fini(self):
     # Restore terminal settings
