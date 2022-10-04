@@ -5,6 +5,8 @@ from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
+from sensor_msgs.msg import Imu
+from geometry_msgs.msg import Vector3
 
 import tf.transformations
 import tf_conversions
@@ -47,6 +49,8 @@ class OdriveMotorControl:
 
         # subscriber cmd_vel
         rospy.Subscriber("cmd_vel", Twist, self.callback_vel)
+        rospy.Subscriber("imu/data", Imu, self.imu_callback)
+        self.imu_msg = Imu()
 
         # publish odom
         self.odom_publisher = rospy.Publisher("odom", Odometry, tcp_nodelay=True, queue_size=10)
@@ -168,15 +172,22 @@ class OdriveMotorControl:
         
         # Distance travelled
         d = (delta_pos_r_m + delta_pos_l_m) / 2.0  # delta_ps
-        th = (delta_pos_r_m - delta_pos_l_m) / self.tire_tread # works for small angles
-    
+        #th = (delta_pos_r_m - delta_pos_l_m) / self.tire_tread # works for small angles
+
+        e = tf.transformations.euler_from_quaternion((self.imu_msg.orientation.x, self.imu_msg.orientation.y, self.imu_msg.orientation.z, self.imu_msg.orientation.w))
+        th = self.imu_msg.angular_velocity.z
         xd = math.cos(th)*d
         yd = -math.sin(th)*d
 
         # Pose: updated from previous pose + position delta
+        """
         self.x += math.cos(self.theta)*xd - math.sin(self.theta)*yd
         self.y += math.sin(self.theta)*xd + math.cos(self.theta)*yd
         self.theta = (self.theta + th) % (2*math.pi)
+        """
+        self.theta = e[2]
+        self.x += math.cos(self.theta)*xd - math.sin(self.theta)*yd
+        self.y += math.sin(self.theta)*xd + math.cos(self.theta)*yd
 
         # Twist/velocity: calculated from motor values only
         self.vel_r = self.encoder_cpr * self.odrv0.axis0.encoder.vel_estimate
@@ -258,26 +269,6 @@ class OdriveMotorControl:
 
         self.odom_path_publisher.publish(self.path)
 
-        #print(delta_pos_r)
-        #print(delta_pos_l)
-        #print(delta_pos_r_m)
-        #print(delta_pos_l_m)
-        #print(d)
-        #print(th)
-        #print(xd)
-        #print(yd)
-        #print(self.x)
-        #print(self.y)
-        #print(self.theta)
-        #print(self.odrv0.axis0.encoder.pos_estimate * 90.0)
-        #print(self.vel_r)
-        #print(self.vel_l)
-        #print(self.vel_l)
-        #print(v)
-        #print(w)
-        #print(math.cos(self.theta)*xd - math.sin(self.theta)*yd)
-        #print(math.sin(self.theta)*xd + math.cos(self.theta)*yd)
-
     def odrive_control(self):
         rate = rospy.Rate(50)
         while not rospy.is_shutdown():
@@ -320,6 +311,26 @@ class OdriveMotorControl:
         self.target_linear_vel = msg.linear.x
         self.target_angular_vel = msg.angular.z
     
+    def imu_callback(self, msg):
+        self.imu_msg.orientation.x = msg.orientation.x
+        self.imu_msg.orientation.y = msg.orientation.y
+        self.imu_msg.orientation.z = msg.orientation.z
+        self.imu_msg.orientation.w = msg.orientation.w	
+        
+        self.imu_msg.angular_velocity.x = msg.angular_velocity.x
+        self.imu_msg.angular_velocity.y = msg.angular_velocity.y
+        self.imu_msg.angular_velocity.z = msg.angular_velocity.z
+        #self.imu_msg.angular_velocity_covariance[0] = msg.angular_velocity_covariance[0]
+        #self.imu_msg.angular_velocity_covariance[4] = msg.angular_velocity_covariance[4]
+        #self.imu_msg.angular_velocity_covariance[8] = msg.angular_velocity_covariance[8]
+        
+        self.imu_msg.linear_acceleration.x = msg.linear_acceleration.x
+        self.imu_msg.linear_acceleration.y = msg.linear_acceleration.y
+        self.imu_msg.linear_acceleration.z = msg.linear_acceleration.z
+        #self.imu_msg.linear_acceleration_covariance[0] = m9a[0] * m9a[0]
+        #self.imu_msg.linear_acceleration_covariance[4] = m9a[1] * m9a[1]
+        #self.imu_msg.linear_acceleration_covariance[8] = m9a[2] * m9a[2]
+
 if __name__ == "__main__":
     rospy.init_node("odrive_motor_control", disable_signals=True)
     Odrive_motor_control = OdriveMotorControl()
