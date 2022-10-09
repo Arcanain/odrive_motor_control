@@ -109,20 +109,6 @@ class OdriveMotorControl:
         self.odom_to_baselink_msg.transform.rotation.y = 0.0
         self.odom_to_baselink_msg.transform.rotation.w = 0.0
         self.odom_to_baselink_msg.transform.rotation.z = 1.0
-        
-        """
-        self.tf_publisher = tf2_ros.TransformBroadcaster()
-        self.tf_msg = TransformStamped()
-        self.tf_msg.header.frame_id = self.odom_frame
-        self.tf_msg.child_frame_id  = self.base_frame
-        self.tf_msg.transform.translation.x = 0.0
-        self.tf_msg.transform.translation.y = 0.0
-        self.tf_msg.transform.translation.z = 0.0
-        self.tf_msg.transform.rotation.x = 0.0
-        self.tf_msg.transform.rotation.y = 0.0
-        self.tf_msg.transform.rotation.w = 0.0
-        self.tf_msg.transform.rotation.z = 1.0
-        """
 
     def find_odrive(self):
         while True:
@@ -232,22 +218,6 @@ class OdriveMotorControl:
             "odom"
         )
 
-        """
-        self.odom_to_baselink_msg.transform.translation.x = self.x
-        self.odom_to_baselink_msg.transform.translation.y = self.y
-        self.odom_to_baselink_msg.transform.rotation.z = q[2]
-        self.odom_to_baselink_msg.transform.rotation.w = q[3]
-        self.odom_broadcaster.sendTransform(self.odom_to_baselink_msg)
-        """
-
-        """
-        self.tf_msg.transform.translation.x = self.x
-        self.tf_msg.transform.translation.y = self.y
-        self.tf_msg.transform.rotation.z = q[2]
-        self.tf_msg.transform.rotation.w = q[3]
-        self.tf_publisher.sendTransform(self.tf_msg)
-        """
-
         #########################
         # Publish Odometry Path #
         #########################
@@ -320,16 +290,10 @@ class OdriveMotorControl:
         self.imu_msg.angular_velocity.x = msg.angular_velocity.x
         self.imu_msg.angular_velocity.y = msg.angular_velocity.y
         self.imu_msg.angular_velocity.z = msg.angular_velocity.z
-        #self.imu_msg.angular_velocity_covariance[0] = msg.angular_velocity_covariance[0]
-        #self.imu_msg.angular_velocity_covariance[4] = msg.angular_velocity_covariance[4]
-        #self.imu_msg.angular_velocity_covariance[8] = msg.angular_velocity_covariance[8]
         
         self.imu_msg.linear_acceleration.x = msg.linear_acceleration.x
         self.imu_msg.linear_acceleration.y = msg.linear_acceleration.y
         self.imu_msg.linear_acceleration.z = msg.linear_acceleration.z
-        #self.imu_msg.linear_acceleration_covariance[0] = m9a[0] * m9a[0]
-        #self.imu_msg.linear_acceleration_covariance[4] = m9a[1] * m9a[1]
-        #self.imu_msg.linear_acceleration_covariance[8] = m9a[2] * m9a[2]
 
 if __name__ == "__main__":
     rospy.init_node("odrive_motor_control", disable_signals=True)
