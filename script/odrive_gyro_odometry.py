@@ -110,6 +110,9 @@ class OdriveMotorControl:
         self.odom_to_baselink_msg.transform.rotation.w = 0.0
         self.odom_to_baselink_msg.transform.rotation.z = 1.0
 
+        # timer
+        self.pre_current_time = rospy.Time.now()
+
     def find_odrive(self):
         while True:
             print("Connect to Odrive...")
@@ -127,6 +130,10 @@ class OdriveMotorControl:
         self.odrv0.axis1.controller.input_vel = 0
     
     def calcodom(self, current_time):
+        dt = (current_time - self.pre_current_time).to_sec()
+        self.pre_current_time = current_time
+        #print(dt)
+
         # https://docs.odriverobotics.com/v/latest/commands.html
         ######################
         # Calcurate Position #
@@ -162,8 +169,9 @@ class OdriveMotorControl:
 
         e = tf.transformations.euler_from_quaternion((self.imu_msg.orientation.x, self.imu_msg.orientation.y, self.imu_msg.orientation.z, self.imu_msg.orientation.w))
         th = self.imu_msg.angular_velocity.z
-        xd = math.cos(th)*d
-        yd = -math.sin(th)*d
+        dth = (th * dt) % (2*math.pi)
+        xd = math.cos(dth)*d
+        yd = -math.sin(dth)*d
 
         # Pose: updated from previous pose + position delta
         """
@@ -171,7 +179,7 @@ class OdriveMotorControl:
         self.y += math.sin(self.theta)*xd + math.cos(self.theta)*yd
         self.theta = (self.theta + th) % (2*math.pi)
         """
-        self.theta = e[2]
+        self.theta = e[2] % (2*math.pi)
         self.x += math.cos(self.theta)*xd - math.sin(self.theta)*yd
         self.y += math.sin(self.theta)*xd + math.cos(self.theta)*yd
 
