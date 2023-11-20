@@ -9,9 +9,44 @@ keyboard_teleop.py     : keyborad input, then publish /cmd_vel.
 OS : Ubuntu Mate  
 ROS : noetic
 
-## composition
+## FlowChart
 
-![Untitled diagram-2023-11-20-054147](https://github.com/Arcanain/odrive_motor_control/assets/52307432/28890134-98b0-42b7-9491-e4dd4eb1ca3e)
+```mermaid
+flowchart TD
+    A[Start] --> B[Initialize ROS Node: odrive_motor_control]
+    B --> C[Create OdriveMotorControl Object]
+    C --> D[Connect to Odrive]
+    D --> E[Setup Parameters and Variables]
+    E --> F[Setup ROS Subscribers and Publishers]
+    F --> G[Setup Transform Broadcasters]
+    G --> H[Enter Main Control Loop]
+    H --> I[Check if ROS is Shutdown]
+    I -->|No| J[Calculate Relative Velocity]
+    J --> K[Get Current Position and Calculate Odometry]
+    K --> L[Publish Odometry and Transform]
+    L --> M[Publish Odometry Path]
+    M --> N[Set Motor Velocity]
+    N --> O[Sleep for Fixed Duration]
+    O --> H
+    I -->|Yes| P[End]
+
+    subgraph OdriveMotorControl
+        Q[Constructor: Initialize and Connect to Odrive]
+        R[odrive_setup: Configure Odrive]
+        S[calc_relative_vel: Calculate Relative Velocities for Wheels]
+        T[callback_vel: Update Target Velocities from ROS Message]
+        U[calcodom: Calculate and Update Odometry]
+        V[odrive_control: Main Control Loop for Motor Velocity]
+    end
+
+    Q --> R
+    R --> V
+    V --> S
+    S --> U
+    U --> L
+    T --> S
+
+```
 
 # motor configuration
 ```
