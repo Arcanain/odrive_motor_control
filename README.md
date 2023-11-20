@@ -10,7 +10,8 @@ OS : Ubuntu Mate
 ROS : noetic
 
 ## composition
-![Untitled diagram-2023-11-20-053818](https://github.com/Arcanain/odrive_motor_control/assets/52307432/7855f467-9c50-4226-a4b3-aa8d1887d376)
+
+![Untitled diagram-2023-11-20-054147](https://github.com/Arcanain/odrive_motor_control/assets/52307432/28890134-98b0-42b7-9491-e4dd4eb1ca3e)
 
 # motor configuration
 ```
