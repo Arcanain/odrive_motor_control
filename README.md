@@ -9,6 +9,9 @@ keyboard_teleop.py     : keyborad input, then publish /cmd_vel.
 OS : Ubuntu Mate  
 ROS : noetic
 
+## composition
+![Untitled diagram-2023-11-20-053818](https://github.com/Arcanain/odrive_motor_control/assets/52307432/7855f467-9c50-4226-a4b3-aa8d1887d376)
+
 # motor configuration
 ```
 cd ~/catkin_ws/src/odrive_motor_control/script
