@@ -48,6 +48,28 @@ flowchart TD
 
 ```
 
+## State Transition Diagram
+
+```mermaid
+flowchart TD
+    A[Start: Initialize Node] -->|Instantiate OdriveMotorControl| B[Constructor: OdriveMotorControl]
+    B --> C[Find Odrive]
+    C --> D[Setup Parameters]
+    D --> E[Setup ROS Subscribers and Publishers]
+    E --> F[Setup Transform Broadcasters]
+    F --> G[Enter Control Loop]
+    G -->|On Each Loop Iteration| H[Calculate Relative Velocity]
+    H --> I[Update Odometry]
+    I --> J[Publish Odometry Data]
+    J --> K[Handle Transform Broadcasting]
+    K --> L[Set Motor Velocities]
+    L --> M[Handle Exceptions]
+    M -->|If No Shutdown| G
+    M --> N[Shutdown: Reset Motor Velocities]
+    N --> O[End]
+
+```
+
 # motor configuration
 ```
 cd ~/catkin_ws/src/odrive_motor_control/script
